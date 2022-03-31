@@ -1,6 +1,9 @@
 # Project starter template for Go backend projects
 
 ## Project structure
+### `jwt` package:
+Package with functions for creating a new token with custom claims, validating a token, and getting claims from a token.
+
 ### `repository` package:
 - `errors.go` contains predefined errors, such as the NotFoundErr and AlreadyExistsErr. They are structs which implement the Error interface.
 - `postgres.go` contains code for establishing a new database connection pool.
