@@ -60,23 +60,22 @@ We can call c.Error() and pass the error (in this case we wrapped it for tracing
 ```Go
 func (s *Server) errorHandler() gin.HandlerFunc {
     return func(c *gin.Context) {
-        c.Next()
+    c.Next()
 
-        err := c.Errors.Last()
+    err := c.Errors.Last()
+    if err != nil {
+        var alreadyExistsErr *repository.AlreadyExistsErr
+        var notFoundErr *repository.NotFoundErr
 
-		if err != nil {
-            var alreadyExistsErr *repository.AlreadyExistsErr
-            var notFoundErr *repository.NotFoundErr
-
-            switch {
+        switch {
             case errors.As(err, &alreadyExistsErr):
                 c.JSON(http.StatusConflict, gin.H{"error": alreadyExistsErr.Error()})
             case errors.As(err, &notFoundErr):
-				c.JSON(http.StatusNotFound, gin.H{"error": notFoundErr.Error()})
+                c.JSON(http.StatusNotFound, gin.H{"error": notFoundErr.Error()})
             default:
-				s.internalServerErrorResponse(c, err)
-            }
-		}
+                s.internalServerErrorResponse(c, err)
+             }
+         }
     }
 }
 ```
