@@ -48,3 +48,7 @@ func (s *Server) validatePageAndLimit(c *gin.Context) (int, int, error) {
 
 	return page, limit, nil
 }
+
+func (s *Server) newError(c *gin.Context, status int, err error) {
+	c.JSON(status, gin.H{"error": err.Error()})
+}

@@ -22,9 +22,9 @@ func (s *Server) errorHandler() gin.HandlerFunc {
 
 			switch {
 			case errors.As(err, &alreadyExistsErr):
-				c.JSON(http.StatusConflict, gin.H{"error": alreadyExistsErr.Error()})
+				s.newError(c, http.StatusConflict, alreadyExistsErr)
 			case errors.As(err, &notFoundErr):
-				c.JSON(http.StatusNotFound, gin.H{"error": notFoundErr.Error()})
+				s.newError(c, http.StatusNotFound, notFoundErr)
 			default:
 				s.internalServerErrorResponse(c, err)
 			}
