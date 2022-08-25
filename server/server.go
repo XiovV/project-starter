@@ -1,13 +1,21 @@
 package server
 
 import (
-	"github.com/XiovV/starter-template/repository"
+	"github.com/XiovV/starter-template/models"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
+)
+
+const (
+	LOCAL_ENV      = "LOCAL"
+	STAGING_ENV    = "STAGING"
+	PRODUCTION_ENV = "PROD"
 )
 
 type Server struct {
-	UserRepository *repository.UserRepository
-	PostRepository *repository.PostRepository
+	UserRepository models.UserService
+	PostRepository models.PostService
+	Logger         *zap.Logger
 }
 
 func (s *Server) New() *gin.Engine {
@@ -23,11 +31,19 @@ func (s *Server) New() *gin.Engine {
 		usersPublic.POST("/login", s.loginUserHandler)
 	}
 
-	usersAuth := v1.Group("/users")
-	usersAuth.Use(s.userAuth)
+	postsAuth := v1.Group("/posts")
+	postsAuth.Use(s.userAuth)
 	{
-		usersAuth.GET("/posts", s.getPostsHandler)
+		postsAuth.GET("/", s.getPostsHandler)
+		postsAuth.POST("/", s.createPostHandler)
+		postsAuth.DELETE("/:postId", s.deletePostHandler)
 	}
 
 	return router
+}
+
+func NewMockServer(userRepository models.UserService, postRepository models.PostService) *gin.Engine {
+	server := Server{UserRepository: userRepository}
+
+	return server.New()
 }

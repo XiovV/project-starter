@@ -6,12 +6,17 @@ import (
 	"fmt"
 	"github.com/XiovV/starter-template/repository"
 	"github.com/XiovV/starter-template/server"
+	"go.uber.org/zap"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+)
+
+var (
+	appEnv = os.Getenv("APP_ENV")
 )
 
 func main() {
@@ -21,9 +26,17 @@ func main() {
 	userRepository := repository.NewUserRepository(db)
 	postRepository := repository.NewPostRepository(db)
 
+	logger, err := initLogger()
+	defer logger.Sync()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	srv := &server.Server{
 		UserRepository: userRepository,
 		PostRepository: postRepository,
+		Logger:         logger,
 	}
 
 	s := &http.Server{
@@ -54,4 +67,24 @@ func main() {
 	}
 
 	log.Println("Server exiting")
+}
+
+func initLogger() (*zap.Logger, error) {
+	if appEnv == server.LOCAL_ENV || appEnv == server.STAGING_ENV {
+		logger, err := zap.NewDevelopment()
+
+		if err != nil {
+			return nil, err
+		}
+
+		return logger, nil
+	}
+
+	logger, err := zap.NewProduction()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return logger, nil
 }

@@ -2,7 +2,7 @@ package server
 
 import (
 	"fmt"
-	"github.com/XiovV/starter-template/repository"
+	"github.com/XiovV/starter-template/models"
 	"github.com/gin-gonic/gin"
 	"strconv"
 )
@@ -13,14 +13,14 @@ const (
 	MinPageValue  = 1
 )
 
-func (s *Server) getUserFromContext(c *gin.Context) repository.User {
+func (s *Server) getUserFromContext(c *gin.Context) models.User {
 	userCtx, exists := c.Get("user")
 	if !exists {
 		s.internalServerErrorResponse(c, fmt.Errorf("user not found in context"))
-		return repository.User{}
+		return models.User{}
 	}
 
-	return userCtx.(repository.User)
+	return userCtx.(models.User)
 }
 
 func (s *Server) validatePageAndLimit(c *gin.Context) (int, int, error) {

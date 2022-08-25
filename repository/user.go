@@ -4,16 +4,10 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/XiovV/starter-template/models"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
 )
-
-type User struct {
-	ID       int    `db:"id"`
-	Username string `db:"username"`
-	Password string `db:"password"`
-	Active   bool   `db:"active"`
-}
 
 type UserRepository struct {
 	db *sqlx.DB
@@ -23,8 +17,8 @@ func NewUserRepository(db *sqlx.DB) *UserRepository {
 	return &UserRepository{db: db}
 }
 
-func (ur *UserRepository) Create(user *User) (User, error) {
-	var u User
+func (ur *UserRepository) Create(user *models.User) (models.User, error) {
+	var u models.User
 
 	ctx, cancel := newBackgroundContext(DefaultQueryTimeout)
 	defer cancel()
@@ -35,18 +29,18 @@ func (ur *UserRepository) Create(user *User) (User, error) {
 		if errors.As(err, &pqErr) {
 			switch pqErr.Code.Name() {
 			case "unique_violation":
-				return User{}, fmt.Errorf("ur.Create: %w", alreadyExistsErr("a user with this username already exists"))
+				return models.User{}, fmt.Errorf("ur.Create: %w", alreadyExistsErr("a user with this username already exists"))
 			}
 		}
 
-		return User{}, err
+		return models.User{}, err
 	}
 
 	return u, nil
 }
 
-func (ur *UserRepository) FindByID(id int) (User, error) {
-	var u User
+func (ur *UserRepository) FindByID(id int) (models.User, error) {
+	var u models.User
 
 	ctx, cancel := newBackgroundContext(DefaultQueryTimeout)
 	defer cancel()
@@ -54,15 +48,15 @@ func (ur *UserRepository) FindByID(id int) (User, error) {
 	err := ur.db.GetContext(ctx, &u, "SELECT * FROM users WHERE id = $1", id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return User{}, fmt.Errorf("ur.FindByID: %w", notFoundErr("user not found"))
+			return models.User{}, fmt.Errorf("ur.FindByID: %w", notFoundErr("user not found"))
 		}
 	}
 
 	return u, nil
 }
 
-func (ur *UserRepository) FindByUsername(username string) (User, error) {
-	var u User
+func (ur *UserRepository) FindByUsername(username string) (models.User, error) {
+	var u models.User
 
 	ctx, cancel := newBackgroundContext(DefaultQueryTimeout)
 	defer cancel()
@@ -70,7 +64,7 @@ func (ur *UserRepository) FindByUsername(username string) (User, error) {
 	err := ur.db.GetContext(ctx, &u, "SELECT * FROM users WHERE username = $1", username)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return User{}, fmt.Errorf("ur.FindByUsername: %w", notFoundErr("user not found"))
+			return models.User{}, fmt.Errorf("ur.FindByUsername: %w", notFoundErr("user not found"))
 		}
 	}
 

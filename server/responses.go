@@ -1,9 +1,9 @@
 package server
 
 import (
-	"fmt"
 	"github.com/XiovV/starter-template/validator"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 	"net/http"
 )
 
@@ -24,6 +24,6 @@ func (s *Server) invalidInputResponse(c *gin.Context, v *validator.Validator) {
 }
 
 func (s *Server) internalServerErrorResponse(c *gin.Context, err error) {
-	fmt.Println("INTERNAL SERVER ERROR:", err)
+	s.Logger.Error("INTERNAL SERVER ERROR", zap.String("err", err.Error()))
 	c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 }

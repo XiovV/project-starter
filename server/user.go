@@ -3,7 +3,7 @@ package server
 import (
 	"fmt"
 	"github.com/XiovV/starter-template/jwt"
-	"github.com/XiovV/starter-template/repository"
+	"github.com/XiovV/starter-template/models"
 	"github.com/XiovV/starter-template/validator"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
@@ -41,7 +41,7 @@ func (s *Server) registerUserHandler(c *gin.Context) {
 		return
 	}
 
-	user := &repository.User{Username: request.Username, Password: string(hashedPassword)}
+	user := &models.User{Username: request.Username, Password: string(hashedPassword)}
 
 	createdUser, err := s.UserRepository.Create(user)
 	if err != nil {
@@ -84,6 +84,8 @@ func (s *Server) loginUserHandler(c *gin.Context) {
 		s.invalidInputResponse(c, v)
 		return
 	}
+
+	fmt.Println("FINDING USER", request.Username)
 
 	user, err := s.UserRepository.FindByUsername(request.Username)
 	if err != nil {
