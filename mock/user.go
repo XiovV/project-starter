@@ -29,6 +29,11 @@ func (m *UserRepository) FindByUsername(username string) (models.User, error) {
 	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(resultUser.Password), bcrypt.DefaultCost)
 
 	resultUser.Password = string(hashedPassword)
-	
-	return resultUser, nil
+
+	var err error
+	if args.Get(1) != nil {
+		err = args.Get(1).(error)
+	}
+
+	return resultUser, err
 }

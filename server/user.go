@@ -85,10 +85,9 @@ func (s *Server) loginUserHandler(c *gin.Context) {
 		return
 	}
 
-	fmt.Println("FINDING USER", request.Username)
-
 	user, err := s.UserRepository.FindByUsername(request.Username)
 	if err != nil {
+		fmt.Println("user not found")
 		c.JSON(http.StatusForbidden, gin.H{"error": "username or password is incorrect"})
 		return
 	}
