@@ -68,7 +68,6 @@ func (s *Server) deletePostHandler(c *gin.Context) {
 
 	post, err := s.PostRepository.FindByPostID(postId)
 	if err != nil {
-		fmt.Println("err")
 		c.Error(fmt.Errorf("deletePostHandler: %w", err))
 		return
 	}
